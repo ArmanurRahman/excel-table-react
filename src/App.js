@@ -1,7 +1,8 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
+import cloneDeep from "lodash/cloneDeep";
 
-const rowMap = { 1: 1, 2: 2, 3: 3 };
+const rowMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };
 const colMap = { A: 1, B: 2, C: 3, D: 4, E: 5, F: 6 };
 const COPY_PATERN = { ROW: "ROW", COL: "COL", BOTH: "BOTH" };
 function App() {
@@ -10,8 +11,7 @@ function App() {
     const [selectRow, setSelectRow] = useState({});
     const [selectColumn, setSelectColumn] = useState({});
     const [copyCell, setCopyCell] = useState("");
-    const [currentCell, setCurrentCell] = useState("");
-    const [nextCell, setNesXtCell] = useState("");
+
     const [minCol, setMinCol] = useState();
     const [maxCol, setMaxCol] = useState();
     const [minRow, setMinRow] = useState();
@@ -43,6 +43,22 @@ function App() {
             E: 0.0555,
             F: 0.0666,
         },
+        4: {
+            A: 0.4111,
+            B: 0.4222,
+            C: 0.4333,
+            D: 0.4444,
+            E: 0.4555,
+            F: 0.4666,
+        },
+        5: {
+            A: 0.5111,
+            B: 0.5222,
+            C: 0.5333,
+            D: 0.5444,
+            E: 0.5555,
+            F: 0.5666,
+        },
     });
 
     const [selectStack, setSelectStack] = useState([]);
@@ -64,11 +80,10 @@ function App() {
     const getKeyByValue = (object, value) => {
         return Object.keys(object).find((key) => object[key] == value);
     };
-    //console.log(isDrag);
+
     const mouseDown = (row, col) => {
-        //console.log("in");
         setSelectCell({ [row + col]: true });
-        //console.log(" mouse down ", row, col);
+
         setIsMouseDown(true);
 
         const slt = [...selectStack];
@@ -119,7 +134,6 @@ function App() {
             ) {
                 return;
             }
-            //console.log(copyPatern);
         }
         if (isMouseDown || isDrag) {
             setMaxCol(col);
@@ -128,10 +142,12 @@ function App() {
     };
 
     const mouseUp = () => {
-        //console.log(" mouse up ");
         setIsMouseDown(false);
         setSelectColumn({});
         setSelectRow({});
+        if (isDrag) {
+            dragAndPasteHanler();
+        }
         setIsDrag(false);
     };
 
@@ -158,11 +174,10 @@ function App() {
                 minRow: minRow,
                 maxRow: maxRow,
             });
-            //console.log("Ctrl + C pressed");
         }
     };
     const handlePaste = () => {
-        const cloneData = { ...data };
+        const cloneData = cloneDeep(data);
         const newData = {};
         let iOffset = rowMap[copyCell.minRow];
         let jOffset = colMap[copyCell.minCol];
@@ -208,23 +223,55 @@ function App() {
     };
 
     const dragStart = (e) => {
-        console.log("drag");
         e.stopPropagation();
         if (rowMap[maxRow] - rowMap[minRow] > colMap[maxCol] - colMap[minCol]) {
             setCopyPatern(COPY_PATERN.COL);
-            console.log("col copy");
         } else if (
             rowMap[maxRow] - rowMap[minRow] <
             colMap[maxCol] - colMap[minCol]
         ) {
             setCopyPatern(COPY_PATERN.ROW);
-            console.log("row copy");
         } else {
             setCopyPatern(COPY_PATERN.BOTH);
         }
         handleCopy();
         setIsDrag(true);
     };
+
+    const dragAndPasteHanler = () => {
+        const cloneData = cloneDeep(data);
+        let startCol;
+        let startRow;
+
+        let iOffset = rowMap[copyCell.minRow];
+        let jOffset = colMap[copyCell.minCol];
+        const newData = {};
+        if (copyCell.maxRow == maxRow) {
+            startCol = colMap[copyCell.maxCol] + 1;
+            startRow = rowMap[copyCell.minRow];
+        } else if (copyCell.maxCol == maxCol) {
+            startCol = colMap[copyCell.minCol];
+            startRow = rowMap[copyCell.maxRow] + 1;
+        }
+
+        for (let i = startRow; i <= rowMap[maxRow]; i++) {
+            for (let j = startCol; j <= colMap[maxCol]; j++) {
+                if (!(getKeyByValue(rowMap, i) in newData)) {
+                    newData[getKeyByValue(rowMap, i)] =
+                        cloneData[getKeyByValue(rowMap, i)];
+                }
+                newData[getKeyByValue(rowMap, i)][getKeyByValue(colMap, j)] =
+                    cloneData[getKeyByValue(rowMap, iOffset)][
+                        getKeyByValue(colMap, jOffset)
+                    ];
+                jOffset++;
+            }
+            jOffset = colMap[copyCell.minCol];
+            iOffset++;
+        }
+        setData({ ...cloneData, ...newData });
+    };
+
     const CustomCell = ({ row, col }) => {
         return (
             <React.Fragment>
@@ -250,8 +297,7 @@ function App() {
             </React.Fragment>
         );
     };
-    //console.log(isMouseDown);
-    //console.log(copyCell);
+
     return (
         <div className='App'>
             <table className='table'>
