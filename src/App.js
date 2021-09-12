@@ -67,10 +67,12 @@ function App() {
     const [selectStack, setSelectStack] = useState([]);
 
     useEffect(() => {
-        document.addEventListener("mouseup", mouseUp);
-        return () => {
-            document.removeEventListener("mouseup", mouseUp);
-        };
+        if (!editCell) {
+            document.addEventListener("mouseup", mouseUp);
+            return () => {
+                document.removeEventListener("mouseup", mouseUp);
+            };
+        }
     });
 
     useEffect(() => {
@@ -121,6 +123,7 @@ function App() {
 
         slt.push(row + col);
         setSelectStack(slt);
+        setEditCell("");
     };
 
     useEffect(() => {
@@ -364,26 +367,21 @@ function App() {
         return style;
     };
 
-    const onEdit = (col, row) => {
-        return (
-            <React.Fragment>
-                <td>
-                    <input />
-                </td>
-            </React.Fragment>
-        );
-    };
-
     const handleDoubleClick = (col, row) => {
-        /*if (isMouseDown) {
-            setIsMouseDown(false);
-            return;
-        }
-        */
-        console.log(row, col);
         setEditCell(row + col);
     };
 
+    const valueChangeHandler = (e, row, col) => {
+        let val = e.target.value;
+
+        const cloneData = cloneDeep(data);
+
+        const newData = {};
+        newData[row] = cloneData[row];
+        newData[row][col] = val;
+
+        setData({ ...cloneData, ...newData });
+    };
     const CustomCell = ({ row, col }) => {
         return (
             <React.Fragment>
@@ -429,12 +427,33 @@ function App() {
                     {Object.keys(data).map((row, index) => (
                         <tr key={index}>
                             <td>{row}</td>
-                            <CustomCell row={row} col='A' />
-                            <CustomCell row={row} col='B' />
-                            <CustomCell row={row} col='C' />
-                            <CustomCell row={row} col='D' />
-                            <CustomCell row={row} col='E' />
-                            <CustomCell row={row} col='F' />
+                            {Object.keys(data[row]).map((col, index) => {
+                                if (editCell == row + col) {
+                                    return (
+                                        <td key={index}>
+                                            <input
+                                                className='input'
+                                                value={data[row][col]}
+                                                onChange={(e) =>
+                                                    valueChangeHandler(
+                                                        e,
+                                                        row,
+                                                        col
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                    );
+                                } else {
+                                    return (
+                                        <CustomCell
+                                            key={index}
+                                            row={row}
+                                            col={col}
+                                        />
+                                    );
+                                }
+                            })}
                         </tr>
                     ))}
                 </tbody>
