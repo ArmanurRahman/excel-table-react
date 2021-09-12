@@ -152,7 +152,6 @@ function App() {
     };
 
     const handleButtonPress = (event) => {
-        //.log("in");
         let charCode = String.fromCharCode(event.which).toLowerCase();
         if (event.ctrlKey && charCode == "c") {
             handleCopy();
@@ -220,6 +219,7 @@ function App() {
         }
 
         setData({ ...cloneData, ...newData });
+        setCopyCell("");
     };
 
     const dragStart = (e) => {
@@ -270,8 +270,78 @@ function App() {
             iOffset++;
         }
         setData({ ...cloneData, ...newData });
+        setCopyCell("");
     };
 
+    const getMarkBorderStyle = (col, row) => {
+        let border = "2px solid gray";
+
+        const style = {};
+        if (
+            rowMap[minRow] == rowMap[row] &&
+            colMap[col] >= colMap[minCol] &&
+            colMap[col] <= colMap[maxCol]
+        ) {
+            style["borderTop"] = border;
+        }
+        if (
+            rowMap[maxRow] == rowMap[row] &&
+            colMap[col] >= colMap[minCol] &&
+            colMap[col] <= colMap[maxCol]
+        ) {
+            style["borderBottom"] = border;
+        }
+        if (
+            colMap[minCol] == colMap[col] &&
+            rowMap[row] >= rowMap[minRow] &&
+            rowMap[row] <= rowMap[maxRow]
+        ) {
+            style["borderLeft"] = border;
+        }
+        if (
+            colMap[maxCol] == colMap[col] &&
+            rowMap[row] >= rowMap[minRow] &&
+            rowMap[row] <= rowMap[maxRow]
+        ) {
+            style["borderRight"] = border;
+        }
+        return style;
+    };
+
+    const getCopyBorderStyle = (col, row) => {
+        let border = "2px dashed deepskyblue";
+
+        const style = {};
+        if (
+            rowMap[copyCell.minRow] == rowMap[row] &&
+            colMap[col] >= colMap[copyCell.minCol] &&
+            colMap[col] <= colMap[copyCell.maxCol]
+        ) {
+            style["borderTop"] = border;
+        }
+        if (
+            rowMap[copyCell.maxRow] == rowMap[row] &&
+            colMap[col] >= colMap[copyCell.minCol] &&
+            colMap[col] <= colMap[copyCell.maxCol]
+        ) {
+            style["borderBottom"] = border;
+        }
+        if (
+            colMap[copyCell.minCol] == colMap[col] &&
+            rowMap[row] >= rowMap[copyCell.minRow] &&
+            rowMap[row] <= rowMap[copyCell.maxRow]
+        ) {
+            style["borderLeft"] = border;
+        }
+        if (
+            colMap[copyCell.maxCol] == colMap[col] &&
+            rowMap[row] >= rowMap[copyCell.minRow] &&
+            rowMap[row] <= rowMap[copyCell.maxRow]
+        ) {
+            style["borderRight"] = border;
+        }
+        return style;
+    };
     const CustomCell = ({ row, col }) => {
         return (
             <React.Fragment>
@@ -279,11 +349,12 @@ function App() {
                     className={
                         selectCell[row + col] ? "td_selected" : undefined
                     }
-                    //onClick={() => handleCurrentCell(row, col)}
+                    style={{
+                        ...getMarkBorderStyle(col, row),
+                        ...getCopyBorderStyle(col, row),
+                    }}
                     onMouseDown={() => mouseDown(row, col)}
                     onMouseEnter={() => mouseOver(row, col)}
-                    //onMouseOut={() => mouseOut(row, col)}
-                    //onMouseUp={() => mouseUp(row, col)}
                 >
                     {data[row][col]}
                     {selectCell[row + col] && row + col == maxRow + maxCol && (
