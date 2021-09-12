@@ -18,6 +18,9 @@ function App() {
     const [maxRow, setMaxRow] = useState();
     const [isDrag, setIsDrag] = useState(false);
     const [copyPatern, setCopyPatern] = useState("");
+    const [editCell, setEditCell] = useState("");
+    const [clicks, setClicks] = useState(0);
+    const delay = 400;
     const [data, setData] = useState({
         1: {
             A: 0.0001,
@@ -81,7 +84,23 @@ function App() {
         return Object.keys(object).find((key) => object[key] == value);
     };
 
-    const mouseDown = (row, col) => {
+    const mouseDown = (event, row, col) => {
+        event.preventDefault();
+        let c = clicks;
+        c++;
+        setClicks(c);
+
+        setTimeout(function () {
+            setClicks(0);
+        }, delay);
+
+        if (c === 2) {
+            // double click event handler should be here
+            handleDoubleClick(col, row);
+            setClicks(0);
+            return;
+        }
+
         setSelectCell({ [row + col]: true });
 
         setIsMouseDown(true);
@@ -344,6 +363,27 @@ function App() {
         }
         return style;
     };
+
+    const onEdit = (col, row) => {
+        return (
+            <React.Fragment>
+                <td>
+                    <input />
+                </td>
+            </React.Fragment>
+        );
+    };
+
+    const handleDoubleClick = (col, row) => {
+        /*if (isMouseDown) {
+            setIsMouseDown(false);
+            return;
+        }
+        */
+        console.log(row, col);
+        setEditCell(row + col);
+    };
+
     const CustomCell = ({ row, col }) => {
         return (
             <React.Fragment>
@@ -355,7 +395,7 @@ function App() {
                         ...getMarkBorderStyle(col, row),
                         ...getCopyBorderStyle(col, row),
                     }}
-                    onMouseDown={() => mouseDown(row, col)}
+                    onMouseDown={(e) => mouseDown(e, row, col)}
                     onMouseEnter={() => mouseOver(row, col)}
                 >
                     {data[row][col]}
