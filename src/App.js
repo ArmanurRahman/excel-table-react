@@ -441,6 +441,7 @@ function App() {
                                                         col
                                                     )
                                                 }
+                                                autoFocus
                                             />
                                         </td>
                                     );
