@@ -177,6 +177,7 @@ function App() {
     };
     const handlePaste = () => {
         const cloneData = cloneDeep(data);
+        const buData = cloneDeep(data);
         const newData = {};
         let iOffset = rowMap[copyCell.minRow];
         let jOffset = colMap[copyCell.minCol];
@@ -203,11 +204,12 @@ function App() {
                     break;
                 }
                 if (!(getKeyByValue(rowMap, i) in newData)) {
-                    newData[getKeyByValue(rowMap, i)] =
-                        cloneData[getKeyByValue(rowMap, i)];
+                    newData[getKeyByValue(rowMap, i)] = cloneDeep(
+                        buData[getKeyByValue(rowMap, i)]
+                    );
                 }
                 newData[getKeyByValue(rowMap, i)][getKeyByValue(colMap, j)] =
-                    cloneData[getKeyByValue(rowMap, iOffset)][
+                    buData[getKeyByValue(rowMap, iOffset)][
                         getKeyByValue(colMap, jOffset)
                     ];
 
