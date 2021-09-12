@@ -5,7 +5,7 @@ import cloneDeep from "lodash/cloneDeep";
 const rowMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };
 const colMap = { A: 1, B: 2, C: 3, D: 4, E: 5, F: 6 };
 const COPY_PATERN = { ROW: "ROW", COL: "COL", BOTH: "BOTH" };
-const Table = () => {
+const Table = ({ rows, cols }) => {
     const [selectCell, setSelectCell] = useState({});
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [selectRow, setSelectRow] = useState({});
@@ -64,8 +64,6 @@ const Table = () => {
         },
     });
 
-    const [selectStack, setSelectStack] = useState([]);
-
     useEffect(() => {
         if (!editCell) {
             document.addEventListener("mouseup", mouseUp);
@@ -107,7 +105,6 @@ const Table = () => {
 
         setIsMouseDown(true);
 
-        const slt = [...selectStack];
         const currentSelectRow = { ...selectRow };
         const currentSelectColumn = { ...selectColumn };
         currentSelectRow[row] = true;
@@ -121,8 +118,6 @@ const Table = () => {
         setSelectRow(currentSelectRow);
         setSelectColumn(currentSelectColumn);
 
-        slt.push(row + col);
-        setSelectStack(slt);
         setEditCell("");
     };
 
