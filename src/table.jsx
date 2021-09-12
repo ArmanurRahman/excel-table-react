@@ -5,6 +5,7 @@ import cloneDeep from "lodash/cloneDeep";
 const rowMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };
 const colMap = { A: 1, B: 2, C: 3, D: 4, E: 5, F: 6 };
 const COPY_PATERN = { ROW: "ROW", COL: "COL", BOTH: "BOTH" };
+
 const Table = ({ rows, cols }) => {
     const [selectCell, setSelectCell] = useState({});
     const [isMouseDown, setIsMouseDown] = useState(false);
@@ -81,7 +82,7 @@ const Table = ({ rows, cols }) => {
     });
 
     const getKeyByValue = (object, value) => {
-        return Object.keys(object).find((key) => object[key] == value);
+        return Object.keys(object).find((key) => object[key] === value);
     };
 
     const mouseDown = (event, row, col) => {
@@ -141,12 +142,12 @@ const Table = ({ rows, cols }) => {
                 return;
             }
             if (
-                copyPatern == COPY_PATERN.COL &&
+                copyPatern === COPY_PATERN.COL &&
                 rowMap[row] < rowMap[copyCell.maxRow]
             ) {
                 return;
             } else if (
-                copyPatern == COPY_PATERN.ROW &&
+                copyPatern === COPY_PATERN.ROW &&
                 colMap[col] < colMap[copyCell.maxCol]
             ) {
                 return;
@@ -170,9 +171,9 @@ const Table = ({ rows, cols }) => {
 
     const handleButtonPress = (event) => {
         let charCode = String.fromCharCode(event.which).toLowerCase();
-        if (event.ctrlKey && charCode == "c") {
+        if (event.ctrlKey && charCode === "c") {
             handleCopy();
-        } else if (event.ctrlKey && charCode == "v") {
+        } else if (event.ctrlKey && charCode === "v") {
             handlePaste();
         }
         if (event.metaKey && charCode === "c") {
@@ -265,10 +266,10 @@ const Table = ({ rows, cols }) => {
         let iOffset = rowMap[copyCell.minRow];
         let jOffset = colMap[copyCell.minCol];
         const newData = {};
-        if (copyCell.maxRow == maxRow) {
+        if (copyCell.maxRow === maxRow) {
             startCol = colMap[copyCell.maxCol] + 1;
             startRow = rowMap[copyCell.minRow];
-        } else if (copyCell.maxCol == maxCol) {
+        } else if (copyCell.maxCol === maxCol) {
             startCol = colMap[copyCell.minCol];
             startRow = rowMap[copyCell.maxRow] + 1;
         }
@@ -297,28 +298,28 @@ const Table = ({ rows, cols }) => {
 
         const style = {};
         if (
-            rowMap[minRow] == rowMap[row] &&
+            rowMap[minRow] === rowMap[row] &&
             colMap[col] >= colMap[minCol] &&
             colMap[col] <= colMap[maxCol]
         ) {
             style["borderTop"] = border;
         }
         if (
-            rowMap[maxRow] == rowMap[row] &&
+            rowMap[maxRow] === rowMap[row] &&
             colMap[col] >= colMap[minCol] &&
             colMap[col] <= colMap[maxCol]
         ) {
             style["borderBottom"] = border;
         }
         if (
-            colMap[minCol] == colMap[col] &&
+            colMap[minCol] === colMap[col] &&
             rowMap[row] >= rowMap[minRow] &&
             rowMap[row] <= rowMap[maxRow]
         ) {
             style["borderLeft"] = border;
         }
         if (
-            colMap[maxCol] == colMap[col] &&
+            colMap[maxCol] === colMap[col] &&
             rowMap[row] >= rowMap[minRow] &&
             rowMap[row] <= rowMap[maxRow]
         ) {
@@ -332,28 +333,28 @@ const Table = ({ rows, cols }) => {
 
         const style = {};
         if (
-            rowMap[copyCell.minRow] == rowMap[row] &&
+            rowMap[copyCell.minRow] === rowMap[row] &&
             colMap[col] >= colMap[copyCell.minCol] &&
             colMap[col] <= colMap[copyCell.maxCol]
         ) {
             style["borderTop"] = border;
         }
         if (
-            rowMap[copyCell.maxRow] == rowMap[row] &&
+            rowMap[copyCell.maxRow] === rowMap[row] &&
             colMap[col] >= colMap[copyCell.minCol] &&
             colMap[col] <= colMap[copyCell.maxCol]
         ) {
             style["borderBottom"] = border;
         }
         if (
-            colMap[copyCell.minCol] == colMap[col] &&
+            colMap[copyCell.minCol] === colMap[col] &&
             rowMap[row] >= rowMap[copyCell.minRow] &&
             rowMap[row] <= rowMap[copyCell.maxRow]
         ) {
             style["borderLeft"] = border;
         }
         if (
-            colMap[copyCell.maxCol] == colMap[col] &&
+            colMap[copyCell.maxCol] === colMap[col] &&
             rowMap[row] >= rowMap[copyCell.minRow] &&
             rowMap[row] <= rowMap[copyCell.maxRow]
         ) {
@@ -392,7 +393,7 @@ const Table = ({ rows, cols }) => {
                     onMouseEnter={() => mouseOver(row, col)}
                 >
                     {data[row][col]}
-                    {selectCell[row + col] && row + col == maxRow + maxCol && (
+                    {selectCell[row + col] && row + col === maxRow + maxCol && (
                         <div
                             className='td_corner'
                             onMouseDown={dragStart}
@@ -423,7 +424,7 @@ const Table = ({ rows, cols }) => {
                         <tr key={index}>
                             <td>{row}</td>
                             {Object.keys(data[row]).map((col, index) => {
-                                if (editCell == row + col) {
+                                if (editCell === row + col) {
                                     return (
                                         <td key={index}>
                                             <input
